@@ -3,8 +3,8 @@ import './Login.css'
 import PropTypes from 'prop-types';
 
 export default function Login({ setToken }) {
-    const [userName, setUserName] = useState("ismail2020");
-    const [password, setPassword] = useState("ismail@2020");
+    const [userName, setUserName] = useState("");
+    const [password, setPassword] = useState("");
 
     /*Get data from api*/
     const handleSubmit = async (e) => {

@@ -17,17 +17,17 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Application</h1>
-        {!token && <Login className="login-form" setToken={setToken} />
-          // < BrowserRouter >
-          //   <Switch>
-          //     <Route path="/login" default>
-          //       <Login className="login-form" setToken={setToken} />
-          //     </Route>
-          //     <Route path="/signIn">
-          //       <Preferences />
-          //     </Route>
-          //   </Switch>
-          // </BrowserRouter>
+        {!token &&
+          < BrowserRouter >
+            <Switch>
+              <Route path="/login" default>
+                <Login className="login-form" setToken={setToken} />
+              </Route>
+              <Route path="/signIn">
+                <Preferences />
+              </Route>
+            </Switch>
+          </BrowserRouter>
         }
         {
           < BrowserRouter >
