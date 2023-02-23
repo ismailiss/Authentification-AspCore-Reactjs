@@ -8,9 +8,9 @@ import useToken from './components/App/useToken';
 
 
 function App() {
+
   const { token, setToken } = useToken();
   useEffect(() => {
-
   }, [token])
 
   return (
@@ -30,7 +30,7 @@ function App() {
           </BrowserRouter>
         }
         {
-          < BrowserRouter >
+          <BrowserRouter >
             <Switch>
               <Route path="/dashboard">
                 <Dashboard />

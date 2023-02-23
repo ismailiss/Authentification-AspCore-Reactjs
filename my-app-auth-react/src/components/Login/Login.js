@@ -11,23 +11,39 @@ export default function Login({ setToken }) {
         e.preventDefault();
 
         console.log(userName, password);
-        let body = ({
-            "Username": userName,
-            "Password": password
-        });
-        console.log(body);
-        const response = await fetch("https://localhost:5001/api/Auth/login",
-            {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                headers: {
-                    'Content-Type': 'application/json'
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: JSON.stringify(body)
-            });
-        const data = await response.json();
+     
+
+           // Example usage:
+      postData('https://localhost:5001/api/Auth/Login', {"Username": userName, "Password": password})
+      .then(data => {
+        console.log(data); // Success! Data is returned in JSON format.
         setToken(data.token);
+
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+
     }
+
+    async function postData(url = '', data = {}) {
+        const response = await fetch(url, {
+          method: 'POST', // or 'PUT'
+          mode: 'cors',
+          cache: 'no-cache',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          redirect: 'follow',
+          referrerPolicy: 'no-referrer',
+          body: JSON.stringify(data)
+        });
+        return response.json();
+      }
+      
+   
+
 
     return (
         <div className="login-wrapper">
@@ -56,3 +72,4 @@ export default function Login({ setToken }) {
 Login.propTypes = {
     setToken: PropTypes.func.isRequired
 };
+

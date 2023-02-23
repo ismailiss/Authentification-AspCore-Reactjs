@@ -14,6 +14,8 @@ namespace ApiAuth
         {
         }
         public DbSet<Student> Students { get; set; }
+        public DbSet<ApplicationUser> ApplicationUser { get; set; }
+        public DbSet<ApplicationRole> ApplicationRole { get; set; }
 
     }
 }

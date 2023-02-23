@@ -28,22 +28,28 @@ namespace ApiAuth.Controllers
             _signInManager = signInManage;
 
         }
-        [HttpPost, Route("login")]
+        [HttpPost, Route("Login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginDTO user)
         {
             if (user == null)
             {
                 return BadRequest("Invalide client request");
             }
-            var userToVerify = await _userManager.FindByNameAsync(user.Username);
-            if (userToVerify == null) return Unauthorized("invalid email");          
+            var userToVerify = await _userManager.FindByEmailAsync(user.Username);
+            if (userToVerify == null) return Unauthorized("invalid email");
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+            var roles = await _userManager.GetRolesAsync(userToVerify);
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, "Operator")
             };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim( ClaimTypes.Role, role ));
+            }
             var tokeOptions = new JwtSecurityToken(
                 issuer: "http://localhost:5000",
                 audience: "http://localhost:5000",
@@ -52,7 +58,7 @@ namespace ApiAuth.Controllers
                 signingCredentials: signinCredentials
             );
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
-            return Ok(new { Token = tokenString });        
+            return Ok(new { Token = tokenString });
         }
         [HttpPost, Route("Inscription")]
         public async Task<IActionResult> Inscription([FromBody] InscriptionDTO user)
@@ -73,13 +79,14 @@ namespace ApiAuth.Controllers
                 {
                     return StatusCode(409, "Email already exist");
                 }
-                var userEntity = new ApplicationUser() {
-                    UserName = user.Username,                
+                var userEntity = new ApplicationUser()
+                {
+                    UserName = user.Username,
                     Email = user.Email,
-                  };
+                };
                 var result = await _userManager.CreateAsync(userEntity, user.Password);
                 if (result.Succeeded) return Ok();
-                   else
+                else
                     return StatusCode(500, $"Internal server error{result.Errors.FirstOrDefault().Description}");
 
             }

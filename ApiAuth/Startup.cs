@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using ApiAuth.Entities.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Net;
 
 namespace ApiAuth
 {
@@ -32,10 +33,12 @@ namespace ApiAuth
             Console.WriteLine(Configuration);
             services.AddControllers();
             services.AddDbContext<MyDbContext>(options =>
-               options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<MyDbContext>()
                 .AddDefaultTokenProviders();
+
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
@@ -47,6 +50,7 @@ namespace ApiAuth
             {
 
             });
+
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings.
@@ -58,6 +62,11 @@ namespace ApiAuth
                 options.Lockout.MaxFailedAccessAttempts = 2;
             });
             services.AddSwaggerDocument();
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
+                options.HttpsPort = 5001;
+            });
 
         }
 
@@ -68,7 +77,6 @@ namespace ApiAuth
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCors("CorsPolicy");
