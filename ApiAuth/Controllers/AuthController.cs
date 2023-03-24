@@ -35,7 +35,7 @@ namespace ApiAuth.Controllers
             {
                 return BadRequest("Invalide client request");
             }
-            var userToVerify = await _userManager.FindByEmailAsync(user.Username);
+            var userToVerify = await _userManager.FindByEmailAsync(user.Email);
             if (userToVerify == null) return Unauthorized("invalid email");
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -43,7 +43,7 @@ namespace ApiAuth.Controllers
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Name, userToVerify.UserName),
             };
 
             foreach (var role in roles)
@@ -54,7 +54,7 @@ namespace ApiAuth.Controllers
                 issuer: "http://localhost:5000",
                 audience: "http://localhost:5000",
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(5),
+                expires: DateTime.Now.AddMinutes(1),
                 signingCredentials: signinCredentials
             );
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);

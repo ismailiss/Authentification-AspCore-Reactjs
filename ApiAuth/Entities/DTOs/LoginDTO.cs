@@ -9,7 +9,7 @@ namespace ApiAuth.Entities.DTOs
     public class LoginDTO
     {
         [MaxLength(255)]
-        public string Username { get; set; }
+        public string Email { get; set; }
         [MaxLength(18)]
         public string Password { get; set; }
     }
