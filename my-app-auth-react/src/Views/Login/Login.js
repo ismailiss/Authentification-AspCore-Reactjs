@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './Login.css'
 import PropTypes from 'prop-types';
 import { Button, TextField ,CssBaseline ,Avatar ,FormControlLabel } from '@mui/material';
@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import Copyright from '../Copyright/Copyright';
+import Copyright from '../../components/common/Copyright/Copyright';
 
 import { useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
@@ -19,7 +19,7 @@ import * as yup from 'yup';
 
 
 
-export default function Login({ setToken }) {
+export default function Login({ setToken}) {
     const history = useHistory();
 
     const toSignIn = () => {

@@ -3,9 +3,12 @@ import jwt_decode from "jwt-decode";
 export default function useToken() {
 
     const getToken = () => {
+
         const tokenString = localStorage.getItem('token');
         console.log(tokenString);
-        if (tokenString) {
+        if (tokenString!= null) {
+            console.log(tokenString);
+
             let decodedToken = jwt_decode(tokenString);
             let currentDate = new Date();
             if (decodedToken.exp * 1000 < currentDate.getTime()) {
@@ -33,8 +36,12 @@ export default function useToken() {
         getToken();
     }, [token])
     const saveToken = userToken => {
+        if(userToken){
+
+        
         localStorage.setItem('token', JSON.stringify(userToken));
         setToken(userToken.token);
+    }
     };
 
     return {

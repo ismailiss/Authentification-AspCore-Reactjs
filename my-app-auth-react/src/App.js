@@ -1,16 +1,18 @@
 import React, { useEffect } from 'react';
 import './App.css';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import Dashboard from './components/Dashboard/Dashboard';
-import Preferences from './components/Preferences/Preferences';
-import Login from './components/Login/Login';
-import useToken from './components/App/useToken';
-import { createBrowserHistory } from 'history';
-import Navbar from './components/Navbar/Navbar';
-import Signin from './components/Signin/Signin';
-import Profile from './components/Profile/Profile';
-import Deconnexion from './components/Deconnexion/Deconnexion';
-import { useHistory } from 'react-router-dom';
+// <Login className="login-form" setToken={setToken} />
+
+import useToken from './helpers/useToken';
+import Navbar from './containers/navs/Navbar/Navbar';
+
+import Signin from './Views/Signin/Signin';
+import Profile from './Views/Profile/Profile';
+import Dashboard from './Views/Dashboard/Dashboard';
+import Preferences from './Views/Preferences/Preferences';
+import Login from './Views/Login/Login';
+
+import NavigationMenu from './containers/navs/NavigationMenu/NavigationMenu';
 
 
 
@@ -23,50 +25,25 @@ function App() {
 
   return (
     <div className="App">
+      <BrowserRouter >
+      <NavigationMenu token={token} setToken={setToken} ></NavigationMenu>
+        <Switch>
+        <Route exact path="/" component={Dashboard} />
 
-        {!token &&
-          <BrowserRouter >
-        <Navbar />
+          <Route path="/dashboard" component={Dashboard}/>
 
-            <Switch>
-              <Route path="/login" default>
-                <Login className="login-form" setToken={setToken} />
-              </Route>
-              <Route path="/signIn">
-                <Signin />
-              </Route>
-              <Route path="/">
-              <Login className="login-form" setToken={setToken} />
-              </Route>
-            </Switch>
-          </BrowserRouter>
-        }
-        {token &&
-          <BrowserRouter >
-                  <Navbar />
+          <Route path="/preferences" component={Preferences}/>
 
-            <Switch>
-              <Route path="/dashboard">
-                <Dashboard />
-              </Route>
-              <Route path="/preferences">
-                <Preferences />
-              </Route>
-              <Route path="/Profile">
-                <Profile />
-              </Route>
-              
-              <Route path="/Login">
-              <Login className="login-form" setToken={setToken} />
-              </Route>
-              
-              
-              <Route path="/">
-                <Dashboard />
-              </Route>
-            </Switch>
-            <Deconnexion ></Deconnexion>
-          </BrowserRouter>}
+          <Route path="/profile" component={Profile}/>
+
+          <Route path="/signIn" component={Signin}/> 
+
+          <Route path="/login" component={Login}>
+            <Login className="login-form" setToken={setToken} />
+          </Route>
+
+        </Switch>
+      </BrowserRouter>
 
 
     </div >
