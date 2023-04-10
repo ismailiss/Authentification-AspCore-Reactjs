@@ -58,7 +58,7 @@ namespace ApiAuth.Controllers
                 signingCredentials: signinCredentials
             );
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
-            return Ok(new { Token = tokenString });
+            return Ok(new { Token = tokenString ,msg=$"Welcome {userToVerify.UserName}"});
         }
         [HttpPost, Route("Inscription")]
         public async Task<IActionResult> Inscription([FromBody] InscriptionDTO user)

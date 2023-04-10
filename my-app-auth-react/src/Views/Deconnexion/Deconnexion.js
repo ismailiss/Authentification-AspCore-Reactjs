@@ -1,19 +1,25 @@
 import { Avatar } from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import { useHistory } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { logoutUserRequest } from '../../store/actionCreators';
 
-export default function Deconnexion({token,setToken}) {
+ function Deconnexion({logoutUserRequest}) {
     const history = useHistory();
     
     const signout = () => {
-        localStorage.removeItem("token");
-        setToken(null)
+        logoutUserRequest();
         history.push('/Login');
     };
 
     return (
         <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }} onClick={signout}>
-            <LockOutlinedIcon />
+            <LogoutRoundedIcon />
         </Avatar>
     )
 }
+const mapDispatchToProps = {
+    logoutUserRequest,
+  };
+  export default connect(null, mapDispatchToProps)(Deconnexion);
+  

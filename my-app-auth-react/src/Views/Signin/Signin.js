@@ -1,10 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import './Signin.css'
-import PropTypes from 'prop-types';
-import { Button, TextField, CssBaseline, Avatar, FormControlLabel } from '@mui/material';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
+import React, { useState } from 'react';
+import { Button, TextField, CssBaseline, Avatar } from '@mui/material';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
@@ -46,18 +41,15 @@ export default function Signin() {
             password: 'asx@6798I',
         },
         validationSchema: validationSchema,
-        onSubmit: (values, actions) => {
+        onSubmit: (values, actions, event) => {
             actions.setStatus(undefined);
-
             postData('https://localhost:5001/api/Auth/Inscription',
                 { "Email": values.email, "Username": values.username, "Password": values.password })
                 .then(data => {
                     console.log(data); // Success! Data is returned in JSON format.
                     if (data.status === 200) {
                         history.push('/Login');
-
                         setEmailExistsError(false);
-
                     }
                     else setEmailExistsError(true);
 
@@ -88,83 +80,81 @@ export default function Signin() {
         return response;
     }
 
-    const theme = createTheme();
 
     return (
-        <ThemeProvider theme={theme}>
-            <Container component="main" maxWidth="xs">
-                <CssBaseline />
-                <Box
-                    sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                    }}
-                >
-                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                        <LockOutlinedIcon />
-                    </Avatar>
-                    <Typography component="h1" variant="h5">
-                        Sign in
-                    </Typography>
-                    <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-                        <div>
-                            <TextField
-                                fullWidth
-                                id="email"
-                                name="email"
-                                label="Email"
-                                value={formik.values.email}
-                                onChange={formik.handleChange}
-                                error={formik.touched.email && Boolean(formik.errors.email)}
-                                helperText={formik.touched.email && formik.errors.email}
+        <Container component="main" maxWidth="xs">
 
-                            />
-                            {emailExistsError && (
-                                <div style={{ color: 'red' }}>
-                                    This email address is already in use.
-                                </div>
-                            )}
-                        </div>
-                        <div>
+            <CssBaseline />
+            <Box
+                sx={{
+                    marginTop: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
+            >
+                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                    <LockOutlinedIcon />
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                    Sign in
+                </Typography>
+                <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
+                    <div>
+                        <TextField
+                            fullWidth
+                            id="email"
+                            name="email"
+                            label="Email"
+                            value={formik.values.email}
+                            onChange={formik.handleChange}
+                            error={formik.touched.email && Boolean(formik.errors.email)}
+                            helperText={formik.touched.email && formik.errors.email}
 
-                            <TextField
-                                fullWidth
-                                id="username"
-                                name="username"
-                                label="Username"
-                                value={formik.values.username}
-                                onChange={formik.handleChange}
-                                error={formik.touched.username && Boolean(formik.errors.username)}
-                                helperText={formik.touched.username && formik.errors.username}
-                            />
-                            <TextField
-                                fullWidth
-                                id="password"
-                                name="password"
-                                label="Password"
-                                type="password"
-                                value={formik.values.password}
-                                onChange={formik.handleChange}
-                                error={formik.touched.password && Boolean(formik.errors.password)}
-                                helperText={formik.touched.password && formik.errors.password}
-                            />
+                        />
+                        {emailExistsError && (
+                            <div style={{ color: 'red' }}>
+                                This email address is already in use.
+                            </div>
+                        )}
+                    </div>
+                    <div>
+
+                        <TextField
+                            fullWidth
+                            id="username"
+                            name="username"
+                            label="Username"
+                            value={formik.values.username}
+                            onChange={formik.handleChange}
+                            error={formik.touched.username && Boolean(formik.errors.username)}
+                            helperText={formik.touched.username && formik.errors.username}
+                        />
+                        <TextField
+                            fullWidth
+                            id="password"
+                            name="password"
+                            label="Password"
+                            type="password"
+                            value={formik.values.password}
+                            onChange={formik.handleChange}
+                            error={formik.touched.password && Boolean(formik.errors.password)}
+                            helperText={formik.touched.password && formik.errors.password}
+                        />
 
 
-                        </div>
+                    </div>
 
-                        <div>
-                            <Button type="submit">OK</Button>
+                    <div>
+                        <Button type="submit">OK</Button>
 
-                            <Button color="primary" onClick={toLogin}>Login</Button>
+                        <Button color="primary" onClick={toLogin}>Login</Button>
 
-                        </div>
-                    </Box>
+                    </div>
                 </Box>
-                <Copyright sx={{ mt: 8, mb: 4 }} />
-            </Container>
-        </ThemeProvider>
+            </Box>
+            <Copyright sx={{ mt: 8, mb: 4 }} />
+        </Container>
     )
 }
 

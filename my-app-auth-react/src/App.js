@@ -1,10 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import './App.css';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-// <Login className="login-form" setToken={setToken} />
 
-import useToken from './helpers/useToken';
-import Navbar from './containers/navs/Navbar/Navbar';
 
 import Signin from './Views/Signin/Signin';
 import Profile from './Views/Profile/Profile';
@@ -14,39 +11,47 @@ import Login from './Views/Login/Login';
 
 import NavigationMenu from './containers/navs/NavigationMenu/NavigationMenu';
 
-
+import { Provider } from 'react-redux';
+import store from './store/store';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 
 function App() {
 
-  const { token, setToken } = useToken();
-  useEffect(() => {
-  }, [token])
+  const theme = createTheme();
 
   return (
-    <div className="App">
-      <BrowserRouter >
-      <NavigationMenu token={token} setToken={setToken} ></NavigationMenu>
-        <Switch>
-        <Route exact path="/" component={Dashboard} />
 
-          <Route path="/dashboard" component={Dashboard}/>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
 
-          <Route path="/preferences" component={Preferences}/>
+        <div className="App">
+          <BrowserRouter >
+            <NavigationMenu  ></NavigationMenu>
+            <Switch>
+              <Route exact path="/" component={Dashboard} />
 
-          <Route path="/profile" component={Profile}/>
+              <Route path="/dashboard" component={Dashboard} />
 
-          <Route path="/signIn" component={Signin}/> 
+              <Route path="/preferences" component={Preferences} />
 
-          <Route path="/login" component={Login}>
-            <Login className="login-form" setToken={setToken} />
-          </Route>
+              <Route path="/profile" component={Profile} />
 
-        </Switch>
-      </BrowserRouter>
+              <Route path="/signIn" component={Signin} />
+
+              <Route path="/login" component={Login}>
+                <Login className="login-form" />
+              </Route>
+
+            </Switch>
+          </BrowserRouter>
+
+        </div >
+      </ThemeProvider>
+    </Provider>
 
 
-    </div >
+
   );
 }
 
