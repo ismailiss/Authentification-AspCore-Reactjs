@@ -2,7 +2,7 @@ import { Avatar } from '@mui/material';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import { useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { logoutUserRequest } from '../../store/actionCreators';
+import { logoutUserRequest } from '../../store/actionCreators/auth';
 
  function Deconnexion({logoutUserRequest}) {
     const history = useHistory();

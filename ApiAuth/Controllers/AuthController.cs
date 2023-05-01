@@ -48,7 +48,7 @@ namespace ApiAuth.Controllers
 
             foreach (var role in roles)
             {
-                claims.Add(new Claim( ClaimTypes.Role, role ));
+                claims.Add(new Claim(ClaimTypes.Role, role));
             }
             var tokeOptions = new JwtSecurityToken(
                 issuer: "http://localhost:5000",
@@ -58,7 +58,7 @@ namespace ApiAuth.Controllers
                 signingCredentials: signinCredentials
             );
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
-            return Ok(new { Token = tokenString ,msg=$"Welcome {userToVerify.UserName}"});
+            return Ok(new { Token = tokenString, msg = $"Welcome {userToVerify.UserName}", id = userToVerify.Id });
         }
         [HttpPost, Route("Inscription")]
         public async Task<IActionResult> Inscription([FromBody] InscriptionDTO user)
@@ -86,14 +86,74 @@ namespace ApiAuth.Controllers
                 };
                 var result = await _userManager.CreateAsync(userEntity, user.Password);
                 if (result.Succeeded) return Ok();
-                else
-                    return StatusCode(500, $"Internal server error{result.Errors.FirstOrDefault().Description}");
+                else return StatusCode(500, $"Internal server error{result.Errors.FirstOrDefault().Description}");
+
 
             }
             catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error");
             }
+        }
+        [HttpPost, Route("UpdateUserProfil")]
+        public async Task<IActionResult> UpdateUserProfilAsync(string id, [FromBody] UserProfilDTO user)
+        {
+            try
+            {
+                if (user == null)
+                {
+                    return BadRequest("user object is null");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invalid model object");
+                }
+                ApplicationUser userExist = await _userManager.FindByIdAsync(id);
+                if (userExist == null)
+                {
+                    return StatusCode(404, "user not exist");
+                }
+                userExist.FirstName = user.FirstName;
+                userExist.LastName = user.LastName;
+                /* userExist.Email = user.Email;*/
+
+                var result = await _userManager.UpdateAsync(userExist);
+                if (result.Succeeded) return Ok();
+                else return StatusCode(500, $"Internal server error{result.Errors.FirstOrDefault().Description}");
+
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProfile(string id)
+        {
+            if (id == null)
+            {
+                return BadRequest("Invalide client request");
+            }
+
+            ApplicationUser userExist = await _userManager.FindByIdAsync(id);
+            if (userExist == null)
+            {
+                return StatusCode(404, "user not exist");
+            }
+            var user = new UserProfilDTO
+            {
+                Email = userExist.Email,
+                Username = userExist.UserName,
+                FirstName = userExist.FirstName,
+                LastName = userExist.LastName,
+                BirthDate = userExist.BirthDate
+
+            };
+            return Ok(new { user = user });
+
         }
     }
 }

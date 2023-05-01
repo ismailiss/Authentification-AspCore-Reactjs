@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
 
 import Signin from './Views/Signin/Signin';
@@ -11,18 +11,18 @@ import Login from './Views/Login/Login';
 
 import NavigationMenu from './containers/navs/NavigationMenu/NavigationMenu';
 
-import { Provider } from 'react-redux';
-import store from './store/store';
+import { useSelector} from 'react-redux';
+import AppWrapper from './AppWrapper';
+
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 
 function App() {
 
   const theme = createTheme();
-
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
   return (
 
-    <Provider store={store}>
       <ThemeProvider theme={theme}>
 
         <div className="App">
@@ -34,8 +34,9 @@ function App() {
               <Route path="/dashboard" component={Dashboard} />
 
               <Route path="/preferences" component={Preferences} />
-
-              <Route path="/profile" component={Profile} />
+              <Route path="/profile">
+                {isAuthenticated ? <Profile /> : <Redirect to="/login" />}
+              </Route>
 
               <Route path="/signIn" component={Signin} />
 
@@ -48,7 +49,6 @@ function App() {
 
         </div >
       </ThemeProvider>
-    </Provider>
 
 
 

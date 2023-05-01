@@ -4,16 +4,17 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Copyright from '../../components/common/Copyright/Copyright';
 
 import { useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import Spinner from '../../components/common/spinner/spinner';
 
 export default function Signin() {
     const history = useHistory();
     const [emailExistsError, setEmailExistsError] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const toLogin = () => {
         history.push('/Login');
@@ -43,18 +44,20 @@ export default function Signin() {
         validationSchema: validationSchema,
         onSubmit: (values, actions, event) => {
             actions.setStatus(undefined);
+            setIsLoading(true);
             postData('https://localhost:5001/api/Auth/Inscription',
                 { "Email": values.email, "Username": values.username, "Password": values.password })
                 .then(data => {
                     console.log(data); // Success! Data is returned in JSON format.
                     if (data.status === 200) {
+                        setIsLoading(false);
                         history.push('/Login');
                         setEmailExistsError(false);
                     }
-                    else setEmailExistsError(true);
-
-
-
+                    else {
+                        setIsLoading(false);
+                        setEmailExistsError(true);
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -83,6 +86,7 @@ export default function Signin() {
 
     return (
         <Container component="main" maxWidth="xs">
+            <Spinner isLoading={isLoading} />
 
             <CssBaseline />
             <Box

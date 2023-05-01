@@ -15,7 +15,7 @@ import Spinner from '../../components/common/spinner/spinner';
 import { useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { loginUserRequest } from '../../store/actionCreators';
+import { loginUserRequest } from '../../store/actionCreators/auth';
 import { connect } from 'react-redux';
 
 

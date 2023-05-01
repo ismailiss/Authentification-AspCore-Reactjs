@@ -3,18 +3,18 @@ import {
     LOGIN_USER_SUCCESS,
     LOGIN_USER_FAILURE,
     LOGOUT_USER_REQUEST
-  } from '../actionCreators';
+  } from '../actionCreators/auth';
   
   const initialState = {
     token: null,
     isLoading: false,
     error: null,
     msg : '',
-    isAuthenticated:false
+    isAuthenticated:false,
+    id:''
   };
   
   const authReducer = (state = initialState, action) => {
-      console.log('reducer');
   
     switch (action.type) {
       case LOGIN_USER_REQUEST:
@@ -29,8 +29,8 @@ import {
           isLoading: false,
           token: action.payload.token,
           msg:action.payload.msg,
-          isAuthenticated:true
-  
+          isAuthenticated:true,
+          id:action.payload.id
         };
       case LOGIN_USER_FAILURE:
         return {
@@ -46,7 +46,8 @@ import {
           isLoading: false,
           error: null,
           msg:null,
-          isAuthenticated:false
+          isAuthenticated:false,
+          id:''
         };
       default:
         return state;

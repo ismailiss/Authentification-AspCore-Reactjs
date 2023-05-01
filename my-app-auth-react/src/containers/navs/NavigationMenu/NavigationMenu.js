@@ -45,7 +45,6 @@ const NavigationBar = ({ isAuthenticated, msg }) => {
     setAnchorEl(null);
   };
 
-  console.log(isAuthenticated, msg);
 
   return (
     <Box sx={{ flexGrow: 1 }}>

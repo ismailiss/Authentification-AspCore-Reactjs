@@ -6,3 +6,6 @@ export const loginUser = (email, password) => {
     password
   });
 }
+export const getProfile = (id) => {
+  return axiosInstance.get('/'+id);
+}

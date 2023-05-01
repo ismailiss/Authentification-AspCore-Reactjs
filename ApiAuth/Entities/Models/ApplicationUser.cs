@@ -10,6 +10,11 @@ namespace ApiAuth.Entities.Models
     {
         [PersonalData]
         public bool IsFirstConnection { get; set; }
-
+        [PersonalData]
+        public string LastName { get; set; }
+        [PersonalData]
+        public string FirstName { get; set; }
+        [PersonalData]
+        public DateTime BirthDate { get; set; }
     }
 }

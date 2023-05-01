@@ -13,12 +13,13 @@ export const loginUserRequest = (email, password) => ({
   }
 });
 
-export const loginUserSuccess = (token,msg,isAuthenticated) => ({
+export const loginUserSuccess = (token,msg,isAuthenticated,id) => ({
   type: LOGIN_USER_SUCCESS,
   payload: {
     token,
     msg,
-    isAuthenticated
+    isAuthenticated,
+    id
   }
 });
 
