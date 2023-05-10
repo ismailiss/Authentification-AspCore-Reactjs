@@ -23,12 +23,12 @@ function Profile({ firstName, lastName, email, username, profileUserRequest,id }
         <Grid item xs={12} sm container>
           <Grid item xs container direction="column" spacing={2}>
             <Grid item>
-            <div variant="h4">{id}</div>
+            <div variant="h4">id : {id}</div>
 
-              <div variant="h4">{firstName}</div>
-              <div variant="h4">{lastName}</div>
-              <div variant="body1">{username}</div>
-              <div variant="body1">{email}</div>
+              <div variant="h4">firstName : {firstName}</div>
+              <div variant="h4">lastName : {lastName}</div>
+              <div variant="body1">username : {username}</div>
+              <div variant="body1">email : {email}</div>
 
             </Grid>
           </Grid>
@@ -42,8 +42,7 @@ const mapStateToProps = (state) => ({
   firstName: state.profile.FirstName,
   lastName: state.profile.LastName,
   email: state.profile.Email,
-  FirstName: state.profile.FirstName,
-  Username: state.profile.Username,
+  username: state.profile.Username,
   id: state.auth.id
 
 });

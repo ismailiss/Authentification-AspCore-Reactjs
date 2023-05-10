@@ -1,26 +1,152 @@
-using System;
+using ApiAuth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using ApiAuth.Entities.Models;
+using Microsoft.AspNetCore.Identity;
+using System;
+using ApiAuth.Utility;
 
-namespace ApiAuth
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddSwaggerGen(options =>
 {
-    public class Program
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        public static void Main(string[] args)
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Description = "Bearer Authentication with JWT Token",
+        Type = SecuritySchemeType.Http
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
                 {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
+                    Id = "Bearer",
+                    Type = ReferenceType.SecurityScheme
+                }
+            },
+            new List<string>()
+        }
+    });
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateActor = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
+builder.Services.AddAuthorization();
+
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddDbContext<MyDbContext>(options =>
+               options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));
+
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+                .AddEntityFrameworkStores<MyDbContext>()
+                .AddDefaultTokenProviders();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy",
+        builder => builder.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader());
+});
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    // Password settings.
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@";
+    options.User.RequireUniqueEmail = true;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
+    options.Lockout.MaxFailedAccessAttempts = 2;
+});
+builder.Services.AddSingleton<TokenUtility>();
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+app.UseAuthentication();
+
+app.MapControllers();
+app.UseCors("CorsPolicy");
+
+app.MapGet("/", () => "HEllo world");
+
+
+
+
+// Build the service provider
+var serviceProvider = builder.Services.BuildServiceProvider();
+
+// Retrieve a service from the DI container
+var myService = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+
+
+using (var RoleManager = myService)
+    {
+        ApplicationRole role = new ApplicationRole()
+        {
+            Name = "SuperAdminName"
+        };
+
+        var roleExist = await RoleManager.RoleExistsAsync(role.Name);
+        if (!roleExist)
+        {
+            var roleResult = await RoleManager.CreateAsync(role);
+        }
+    }
+
+
+    using (var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>())
+    {
+        ApplicationUser user1 = await UserManager.FindByEmailAsync("ismailelaissaoui@gmail.com");
+        if (user1 == null)
+        {
+            user1 = new ApplicationUser()
+            {
+                UserName = "ismailelaissaoui",
+                Email = "ismailelaissaoui@gmail.com",
+            };
+            await UserManager.CreateAsync(user1, "asx@6798I");
+        }
+        await UserManager.AddToRoleAsync(user1, "SuperAdminName");
+    }
+
+app.Run();

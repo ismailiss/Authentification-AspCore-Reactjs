@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ApiAuth.Entities.DTOs;
 using ApiAuth.Entities.Models;
+using ApiAuth.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,11 +23,15 @@ namespace ApiAuth.Controllers
         private readonly MyDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        public AuthController(MyDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManage)
+        private  readonly TokenUtility _utility;
+
+
+        public AuthController(MyDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManage, TokenUtility utility)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManage;
+            _utility = utility;
 
         }
         [HttpPost, Route("Login")]
@@ -45,6 +51,7 @@ namespace ApiAuth.Controllers
             {
                 new Claim(ClaimTypes.Name, userToVerify.UserName),
             };
+            claims.Add(new Claim("Id", userToVerify.Id));
 
             foreach (var role in roles)
             {
@@ -95,20 +102,30 @@ namespace ApiAuth.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-        [HttpPost, Route("UpdateUserProfil")]
+
+      [Authorize]
+        [HttpPut("updateUserProfil/{id}")]
         public async Task<IActionResult> UpdateUserProfilAsync(string id, [FromBody] UserProfilDTO user)
         {
             try
             {
-                if (user == null)
+                if (!ModelState.IsValid)
                 {
-                    return BadRequest("user object is null");
+                    return BadRequest(ModelState);
                 }
+              
 
                 if (!ModelState.IsValid)
                 {
                     return BadRequest("Invalid model object");
                 }
+                var authHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+                var userId = _utility.GetUserIdFromToken(authHeader);
+                if (userId != id)
+                {
+                    return Unauthorized();
+                }
+
                 ApplicationUser userExist = await _userManager.FindByIdAsync(id);
                 if (userExist == null)
                 {
@@ -116,6 +133,8 @@ namespace ApiAuth.Controllers
                 }
                 userExist.FirstName = user.FirstName;
                 userExist.LastName = user.LastName;
+                userExist.BirthDate = user.BirthDate;
+
                 /* userExist.Email = user.Email;*/
 
                 var result = await _userManager.UpdateAsync(userExist);

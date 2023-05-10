@@ -13,7 +13,7 @@ function* profil(action) {
     const username = response.data.user.username;
     const lastName = response.data.user.lastName;
     const firstName = response.data.user.firstName;
-    const birthDate = response.data.user.BirthDate;
+    const birthDate = response.data.user.birthDate;
     
     console.log(response);
     yield put(profileUserSuccess(email,username,lastName,firstName,birthDate));

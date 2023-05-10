@@ -35,7 +35,7 @@ import {
           isLoading: false,
           Email: action.payload.email,
           Username:action.payload.username,
-          LastName:action.payload.kastName,
+          LastName:action.payload.lastName,
           FirstName:action.payload.firstName,
           BirthDate:action.payload.birthDate,
           error : ''
