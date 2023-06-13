@@ -1,23 +1,22 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React from "react";
+import { connect } from "react-redux";
 
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Button from '@material-ui/core/Button';
-import Box from '@material-ui/core/Box';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import AccountCircle from '@mui/icons-material/AccountCircle';
+import { makeStyles } from "@material-ui/core/styles";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Button from "@material-ui/core/Button";
+import Box from "@material-ui/core/Box";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
+import { ListItemIcon, ListItemText } from "@mui/material";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
+import { Link } from "react-router-dom";
 
-import { Link } from 'react-router-dom';
-
-
-import Deconnexion from '../../../Views/Deconnexion/Deconnexion';
+import Deconnexion from "../../../Views/Deconnexion/Deconnexion";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,8 +34,6 @@ const NavigationBar = ({ isAuthenticated, msg }) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-
-
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -44,7 +41,6 @@ const NavigationBar = ({ isAuthenticated, msg }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -60,18 +56,27 @@ const NavigationBar = ({ isAuthenticated, msg }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <Button component={Link} to="/" color="inherit">Home</Button>
-            <Button component={Link} to="/dashboard" color="inherit">dashboard</Button>
-            <Button component={Link} to="/preferences" color="inherit">Preferences</Button>
-          </Typography> 
-
+            <Button component={Link} to="/" color="inherit">
+              Home
+            </Button>
+            <Button component={Link} to="/dashboard" color="inherit">
+              dashboard
+            </Button>
+            <Button component={Link} to="/preferences" color="inherit">
+              Preferences
+            </Button>
+          </Typography>
 
           {!isAuthenticated && (
-              <div ><Button component={Link} to="/login" color="inherit">Login</Button>
-              <Button component={Link} to="/Signin" color="inherit">Signin</Button>
-              </div>
-            )
-          }
+            <div>
+              <Button component={Link} to="/login" color="inherit">
+                Login
+              </Button>
+              <Button component={Link} to="/Signin" color="inherit">
+                Signin
+              </Button>
+            </div>
+          )}
 
           {isAuthenticated && (
             <div>
@@ -83,40 +88,42 @@ const NavigationBar = ({ isAuthenticated, msg }) => {
                 onClick={handleMenu}
                 color="inherit"
               >
-                <AccountCircle />
+                <MenuIcon />
               </IconButton>
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorEl}
                 anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+                  vertical: "top",
+                  horizontal: "right",
                 }}
                 keepMounted
                 transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+                  vertical: "top",
+                  horizontal: "right",
                 }}
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem component={Link} to="/profile">Profile</MenuItem>
-                <Deconnexion className="ml-auto" ></Deconnexion>
+                <MenuItem component={Link} to="/profile">
+                  <ListItemIcon>
+                    <AccountCircle fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Profile</ListItemText>
+                </MenuItem>
+                <Deconnexion className="ml-auto"></Deconnexion>
               </Menu>
             </div>
           )}
-
         </Toolbar>
       </AppBar>
     </Box>
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
-  msg: state.auth.msg
-
+  msg: state.auth.msg,
 });
-
 
 export default connect(mapStateToProps)(NavigationBar);

@@ -12,7 +12,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace ApiAuth.Controllers
 {
@@ -24,14 +26,17 @@ namespace ApiAuth.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private  readonly TokenUtility _utility;
+        private readonly IConfiguration _configuration;
 
 
-        public AuthController(MyDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManage, TokenUtility utility)
+        public AuthController(MyDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManage, TokenUtility utility, IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManage;
             _utility = utility;
+            _configuration = configuration;
+
 
         }
         [HttpPost, Route("Login")]
@@ -43,29 +48,35 @@ namespace ApiAuth.Controllers
             }
             var userToVerify = await _userManager.FindByEmailAsync(user.Email);
             if (userToVerify == null) return Unauthorized("invalid email");
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
-            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-            var roles = await _userManager.GetRolesAsync(userToVerify);
 
-            var claims = new List<Claim>
+            var issuer = _configuration["Jwt:Issuer"];
+            var audience = _configuration["Jwt:Audience"];
+            var key = Encoding.UTF8.GetBytes (_configuration["Jwt:Key"]);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
-                new Claim(ClaimTypes.Name, userToVerify.UserName),
+                Subject = new ClaimsIdentity(new[]
+                {
+                new Claim("Id", Guid.NewGuid().ToString()),
+                new Claim("userId", userToVerify.Id),
+                new Claim(JwtRegisteredClaimNames.Sub, userToVerify.UserName),
+                new Claim(JwtRegisteredClaimNames.Email, userToVerify.Email),
+                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+                }),
+
+
+                Expires = DateTime.UtcNow.AddDays(5),
+                Issuer = issuer,
+                Audience = audience,
+                SigningCredentials = new SigningCredentials
+                (new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
-            claims.Add(new Claim("Id", userToVerify.Id));
 
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-            var tokeOptions = new JwtSecurityToken(
-                issuer: "http://localhost:5000",
-                audience: "http://localhost:5000",
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(1),
-                signingCredentials: signinCredentials
-            );
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
-            return Ok(new { Token = tokenString, msg = $"Welcome {userToVerify.UserName}", id = userToVerify.Id });
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var stringToken = tokenHandler.WriteToken(token);
+
+            return Ok(new { Token = stringToken, msg = $"Welcome {userToVerify.UserName}", id = userToVerify.Id });
         }
         [HttpPost, Route("Inscription")]
         public async Task<IActionResult> Inscription([FromBody] InscriptionDTO user)
@@ -103,9 +114,10 @@ namespace ApiAuth.Controllers
             }
         }
 
-      [Authorize]
-        [HttpPut("updateUserProfil/{id}")]
-        public async Task<IActionResult> UpdateUserProfilAsync(string id, [FromBody] UserProfilDTO user)
+        [HttpPut("updateUserProfile/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
+        public async Task<IActionResult> UpdateUserProfileAsync(string id, [FromBody] UserProfilDTO user)
         {
             try
             {
@@ -149,8 +161,10 @@ namespace ApiAuth.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetProfile(string id)
+        [HttpGet, Route("GetUserProfile/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
+        public async Task<IActionResult> GetUserProfile(string id)
         {
             if (id == null)
             {

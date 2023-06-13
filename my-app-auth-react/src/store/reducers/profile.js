@@ -19,7 +19,6 @@ import {
   };
   
   const profileReducer = (state = initialState, action) => {
-      console.log(state);
       console.log(action);
 
     switch (action.type) {

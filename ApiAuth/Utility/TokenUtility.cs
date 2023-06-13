@@ -21,7 +21,7 @@ namespace ApiAuth.Utility
                 // 2. Parse the token to extract the user ID
                 var handler = new JwtSecurityTokenHandler();
                 var jwt = handler.ReadJwtToken(token);
-                var userId = jwt.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+                var userId = jwt.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
                 return userId;
             }

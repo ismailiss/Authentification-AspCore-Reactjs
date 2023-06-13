@@ -16,6 +16,9 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using ApiAuth.Utility;
 
+//System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -48,9 +51,16 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+var issuer = builder.Configuration["Jwt:Issuer"];
+builder.Services.AddAuthentication( options =>
 {
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}
+).AddJwtBearer(options =>
+{
+    options.IncludeErrorDetails = true;
+
     options.TokenValidationParameters = new TokenValidationParameters()
     {
         ValidateActor = true,
@@ -60,8 +70,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+
     };
 });
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -70,8 +82,8 @@ builder.Services.AddDbContext<MyDbContext>(options =>
                options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
-                .AddEntityFrameworkStores<MyDbContext>()
-                .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<MyDbContext>();
+               // .AddDefaultTokenProviders();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
@@ -88,7 +100,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@";
     options.User.RequireUniqueEmail = true;
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
-    options.Lockout.MaxFailedAccessAttempts = 2;
+    options.Lockout.MaxFailedAccessAttempts = 10;
 });
 builder.Services.AddSingleton<TokenUtility>();
 var app = builder.Build();
@@ -100,14 +112,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
-app.UseAuthentication();
-
 app.MapControllers();
+
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseCors("CorsPolicy");
 
-app.MapGet("/", () => "HEllo world");
+app.UseMiddleware<ResponseRewritingMiddleware>();
 
 
 
@@ -134,19 +145,19 @@ using (var RoleManager = myService)
     }
 
 
-    using (var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>())
+    /*using (var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>())
     {
-        ApplicationUser user1 = await UserManager.FindByEmailAsync("ismailelaissaoui@gmail.com");
+        ApplicationUser user1 = await UserManager.FindByEmailAsync("@gmail.com");
         if (user1 == null)
         {
             user1 = new ApplicationUser()
             {
                 UserName = "ismailelaissaoui",
-                Email = "ismailelaissaoui@gmail.com",
+                Email = "@gmail.com",
             };
             await UserManager.CreateAsync(user1, "asx@6798I");
         }
         await UserManager.AddToRoleAsync(user1, "SuperAdminName");
-    }
+    }*/
 
 app.Run();

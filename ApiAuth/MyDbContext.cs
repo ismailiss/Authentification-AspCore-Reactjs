@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ApiAuth
 {
-    public class MyDbContext : IdentityDbContext<ApplicationUser, ApplicationRole , string>
+    public class MyDbContext : IdentityDbContext<ApplicationUser, ApplicationRole,string>
     {
         public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
         {

@@ -1,25 +1,30 @@
-import { Avatar } from '@mui/material';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
-import { useHistory } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { logoutUserRequest } from '../../store/actionCreators/auth';
+import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
+import { useHistory } from "react-router-dom";
+import { connect } from "react-redux";
+import { logoutUserRequest } from "../../store/actionCreators/auth";
+import LogoutRoundedIcon from "@mui/icons-material/Logout";
 
- function Deconnexion({logoutUserRequest}) {
-    const history = useHistory();
-    
-    const signout = () => {
-        logoutUserRequest();
-        history.push('/Login');
-    };
+function Deconnexion({ logoutUserRequest }) {
+  const history = useHistory();
 
-    return (
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }} onClick={signout}>
-            <LogoutRoundedIcon />
-        </Avatar>
-    )
+  const signout = () => {
+    logoutUserRequest();
+    history.push("/Login");
+  };
+
+  return (
+    <>
+      <MenuItem onClick={signout}>
+        <ListItemIcon>
+          <LogoutRoundedIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Logout</ListItemText>
+      </MenuItem>
+    </>
+
+  );
 }
 const mapDispatchToProps = {
-    logoutUserRequest,
-  };
-  export default connect(null, mapDispatchToProps)(Deconnexion);
-  
+  logoutUserRequest,
+};
+export default connect(null, mapDispatchToProps)(Deconnexion);
