@@ -13,20 +13,22 @@ export const loginUserRequest = (email, password) => ({
   }
 });
 
-export const loginUserSuccess = (token,msg,isAuthenticated,id) => ({
+export const loginUserSuccess = (token,msg,isAuthenticated,id,notification) => ({
   type: LOGIN_USER_SUCCESS,
   payload: {
     token,
     msg,
     isAuthenticated,
-    id
+    id,
+    notification
   }
 });
 
-export const loginUserFailure = (error,isAuthenticated) => ({
+export const loginUserFailure = (error,isAuthenticated,notification) => ({
   type: LOGIN_USER_FAILURE,
   payload: {
-    error
+    error,
+    notification
   }
 });
 

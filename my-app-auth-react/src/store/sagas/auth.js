@@ -3,6 +3,7 @@ import {
   LOGIN_USER_REQUEST,
   loginUserSuccess,
   loginUserFailure,
+  logoutUserRequest,
   LOGOUT_USER_REQUEST
 } from '../actionCreators/auth';
 import { loginUser } from '../../utils/api';
@@ -15,13 +16,20 @@ function* login(action) {
     const token = response.data.token;
     const msg = response.data.msg;
     const id = response.data.id;
+    const notification={
+      type:'success',
+      text:'login ok'
+    }
     localStorage.setItem('token', token);
     localStorage.setItem('msg', msg);
     localStorage.setItem('id', id);
 
-    yield put(loginUserSuccess(token, msg, true, id));
+    yield put(loginUserSuccess(token, msg, true, id,notification));
   } catch (error) {
-    yield put(loginUserFailure(error, false));
+    yield put(loginUserFailure(error, false,{
+      type:'error',
+      text:'somthing went wrong'
+    }));
   }
 }
 function logout() {
@@ -50,7 +58,7 @@ function* authFlow() {
     localStorage.removeItem('token');
     localStorage.removeItem('msg');
     localStorage.removeItem('id');
-    yield put(loginUserFailure("login not found", false));
+    yield put(logoutUserRequest("", false));
   }
 }
 export default function* authSaga() {

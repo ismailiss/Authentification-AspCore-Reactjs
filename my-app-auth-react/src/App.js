@@ -15,15 +15,20 @@ import { useSelector} from 'react-redux';
 import AppWrapper from './AppWrapper';
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
 
   const theme = createTheme();
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+
+  // Configure toast options
+
   return (
 
       <ThemeProvider theme={theme}>
+      <ToastContainer />
 
         <div className="App">
           <BrowserRouter >

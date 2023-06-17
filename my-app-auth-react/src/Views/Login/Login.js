@@ -17,9 +17,10 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { loginUserRequest } from '../../store/actionCreators/auth';
 import { connect } from 'react-redux';
+import { toast } from 'react-toastify';
 
 
-function Login({ loginUserRequest, msg, isLoading, error, isAuthenticated }) {
+function Login({ loginUserRequest, msg, isLoading, error, isAuthenticated ,notification}) {
 
   const history = useHistory();
 
@@ -27,9 +28,20 @@ function Login({ loginUserRequest, msg, isLoading, error, isAuthenticated }) {
     history.push('/Signin');
   };
   useEffect(() => {
-    if (isAuthenticated)
+    console.log(isAuthenticated)
+    if (isAuthenticated){
       history.push('/Profile');
+    }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    console.log(notification);
+    if(notification!=null && notification.type==='error') 
+      toast.error(notification.text);
+      
+    if(notification!=null && notification.type==='success') 
+    toast.success(notification.text);
+  }, [notification]);
 
 
   const validationSchema = yup.object({
@@ -140,7 +152,8 @@ const mapStateToProps = state => ({
   error: state.auth.error,
   msg: state.auth.msg,
   isLoading: state.auth.isLoading,
-  isAuthenticated: state.auth.isAuthenticated
+  isAuthenticated: state.auth.isAuthenticated,
+  notification: state.auth.notification
 });
 
 const mapDispatchToProps = {

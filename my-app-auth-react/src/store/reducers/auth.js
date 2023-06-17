@@ -11,11 +11,13 @@ import {
     error: null,
     msg : '',
     isAuthenticated:false,
-    id:''
+    id:'',
+    notification:{}
+
   };
   
   const authReducer = (state = initialState, action) => {
-  
+  console.log(action.payload);
     switch (action.type) {
       case LOGIN_USER_REQUEST:
         return {
@@ -30,14 +32,18 @@ import {
           token: action.payload.token,
           msg:action.payload.msg,
           isAuthenticated:true,
-          id:action.payload.id
+          id:action.payload.id,
+          notification:action.payload.notification
+
         };
       case LOGIN_USER_FAILURE:
         return {
           ...state,
           isLoading: false,
-          error: action.payload.error,
-          isAuthenticated:false
+          error: action.payload.error.message,
+          isAuthenticated:false,          
+          notification:action.payload.notification
+
         };
         
       case LOGOUT_USER_REQUEST:
@@ -47,8 +53,10 @@ import {
           error: null,
           msg:null,
           isAuthenticated:false,
-          id:''
-        };
+          id:'',
+          notification:{
+          }       
+         };
       default:
         return state;
     }
