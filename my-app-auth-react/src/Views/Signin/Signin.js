@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box,Button, TextField, CssBaseline, Avatar,Typography,Container} from '@mui/material';
+import { Box, Button, TextField, CssBaseline, Avatar, Typography, Container } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Copyright from '../../components/common/Copyright/Copyright';
 
@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import Spinner from '../../components/common/spinner/spinner';
+import { toast } from 'react-toastify';
 
 export default function Signin() {
     const history = useHistory();
@@ -51,13 +52,20 @@ export default function Signin() {
                         history.push('/Login');
                         setEmailExistsError(false);
                     }
-                    else {
+                    else if (data.status === 409) {
                         setIsLoading(false);
                         setEmailExistsError(true);
+                    }
+                    else {
+                        toast.error("Something went wrong");
+                        setIsLoading(false);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
+                    toast.error("Something went wrong");
+                    setIsLoading(false);
+
                 });
 
         },

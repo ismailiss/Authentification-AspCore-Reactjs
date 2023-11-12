@@ -5,13 +5,14 @@ const mapStateToProps = state => ({
   isAuthenticated: state.auth.isAuthenticated,
 });
 
-function ConnectedBrowserRouter({ isAuthenticated }){
-return(
-<BrowserRouter isAuthenticated={isAuthenticated}>
-    
-</BrowserRouter>
-)
-    
+function ConnectedBrowserRouter({ isAuthenticated }) {
+  console.log('isAuthenticated');
+  return (
+    <BrowserRouter isAuthenticated={isAuthenticated}>
+
+    </BrowserRouter>
+  )
+
 }
 
 export default connect(mapStateToProps)(ConnectedBrowserRouter);

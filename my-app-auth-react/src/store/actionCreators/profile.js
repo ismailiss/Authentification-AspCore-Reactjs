@@ -33,8 +33,13 @@ export const profileUserFailure = (error,isAuthenticated) => ({
   }
 });
 
-export const editProfileUserRequest = () => ({
+export const editProfileUserRequest = ( firstName, lastName, email, username,birthDate) => ({
   type: EDIT_PROFILE_USER_REQUEST,
   payload: {
+    firstName,
+     lastName,
+      email, 
+      username,
+      birthDate
   }
 });

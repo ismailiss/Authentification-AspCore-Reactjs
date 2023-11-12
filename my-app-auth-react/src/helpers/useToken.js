@@ -5,8 +5,9 @@ export default function useToken() {
     const getToken = () => {
 
         const tokenString = localStorage.getItem('token');
+        console.log("useToken");
         console.log(tokenString);
-        if (tokenString!= null) {
+        if (tokenString != null) {
             console.log(tokenString);
 
             let decodedToken = jwt_decode(tokenString);
@@ -36,12 +37,12 @@ export default function useToken() {
         getToken();
     }, [token])
     const saveToken = userToken => {
-        if(userToken){
+        if (userToken) {
 
-        
-        localStorage.setItem('token', JSON.stringify(userToken));
-        setToken(userToken.token);
-    }
+
+            localStorage.setItem('token', JSON.stringify(userToken));
+            setToken(userToken.token);
+        }
     };
 
     return {

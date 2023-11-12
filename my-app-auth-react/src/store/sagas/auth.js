@@ -7,6 +7,7 @@ import {
   LOGOUT_USER_REQUEST
 } from '../actionCreators/auth';
 import { loginUser } from '../../utils/api';
+import jwt_decode from "jwt-decode";
 
 function* login(action) {
   try {
@@ -16,50 +17,77 @@ function* login(action) {
     const token = response.data.token;
     const msg = response.data.msg;
     const id = response.data.id;
-    const notification={
-      type:'success',
-      text:'login ok'
+    const notification = {
+      type: 'success',
+      text: 'login ok'
     }
     localStorage.setItem('token', token);
     localStorage.setItem('msg', msg);
     localStorage.setItem('id', id);
 
-    yield put(loginUserSuccess(token, msg, true, id,notification));
+    yield put(loginUserSuccess(token, msg, true, id, notification));
   } catch (error) {
-    yield put(loginUserFailure(error, false,{
-      type:'error',
-      text:'somthing went wrong'
+    yield put(loginUserFailure(error, false, {
+      type: 'error',
+      text: 'somthing went wrong'
     }));
   }
 }
+
 function logout() {
   console.log('logout');
-
   // Clear the token from the local storage.
   localStorage.removeItem('token');
   localStorage.removeItem('msg');
   localStorage.removeItem('id');
-  // Perform any other necessary cleanup actions.
 }
 
-function* authFlow() {
+function* getToken(token) {
+  console.log('authFlow');
+
+  const msg = localStorage.getItem('msg');
+  const id = localStorage.getItem('id');
+  yield put(loginUserSuccess(token, msg, true, id));
+}
+
+function* removeToken() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("msg");
+  localStorage.removeItem("id");
+  yield put(logoutUserRequest("", false));
+
+}
+
+function authFlow() {
   // Check for an existing token in the local storage.
   console.log('authFlow');
 
   const token = localStorage.getItem('token');
-  const msg = localStorage.getItem('msg');
-  const id = localStorage.getItem('id');
-  if (token) {
-    // If a token is found, dispatch a success action with the token value.
 
-    yield put(loginUserSuccess(token, msg, true, id));
-  } else {
-    // If no token is found, dispatch a failure action.
-    localStorage.removeItem('token');
-    localStorage.removeItem('msg');
-    localStorage.removeItem('id');
-    yield put(logoutUserRequest("", false));
+  if (token != null) {
+    let decodedToken = jwt_decode(token);
+    if (decodedToken != null) {
+      // If a token is found, dispatch a success action with the token value.
+      let currentDate = new Date();
+      if (decodedToken.exp * 1000 > currentDate.getTime()) {
+        console.log("Token not expired.");
+        getToken(token)
+      }
+      else {
+        removeToken()
+      }
+
+    }
+    else {
+      removeToken()
+    }
   }
+  else {
+    removeToken()
+  }
+
+
+
 }
 export default function* authSaga() {
   // Watch for login and logout actions.

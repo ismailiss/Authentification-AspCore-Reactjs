@@ -1,19 +1,30 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import { Avatar, Grid, Container, CssBaseline, Box, Typography, TextField } from '@material-ui/core';
+import { Avatar, Button, Container, CssBaseline, Box, Typography, TextField } from '@material-ui/core';
 import { profileUserRequest } from '../../store/actionCreators/profile';
 import Spinner from '../../components/common/spinner/spinner';
 import Copyright from '../../components/common/Copyright/Copyright';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { useHistory } from 'react-router-dom';
 
 
-function Profile({ firstName, lastName, email, username,birthDate, profileUserRequest, id, isLoading }) {
+function Profile({ firstName,
+  lastName, email, username, birthDate, profileUserRequest, id, isLoading }) {
+
+  const history = useHistory();
 
   useEffect(() => {
     profileUserRequest(id); // Fetch the user's information when the component mounts
     console.log(id);
   }, []);
+
+
+  const ProfilEdit = () => {
+    console.log('ccc');
+
+    history.push('/ProfilEdit');
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -63,9 +74,9 @@ function Profile({ firstName, lastName, email, username,birthDate, profileUserRe
             name="birthDate"
             label="Birth date:"
             type="date"
-            value={birthDate}    InputLabelProps={{
+            value={birthDate} InputLabelProps={{
               shrink: true,
-            }}disabled />
+            }} disabled />
 
           <TextField
             fullWidth
@@ -78,6 +89,9 @@ function Profile({ firstName, lastName, email, username,birthDate, profileUserRe
         </Box>
 
       </Box>
+      <Button variant="contained" color="primary" onClick={ProfilEdit}>
+        Update
+      </Button>
       <Copyright sx={{ mt: 8, mb: 4 }} />
     </Container>);
 }
